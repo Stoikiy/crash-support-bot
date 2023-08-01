@@ -1,10 +1,14 @@
-import client from './modules/index.mjs';
+import client from '@modules/BotClient.mjs';
+import ImageAnalyser from "@modules/ImageAnalyser.js";
 
-client.on('ready', (c) => {
+import {ClientEvents} from "@enums/index";
+
+const analyser = new ImageAnalyser();
+client.on(ClientEvents.Ready, (c) => {
     console.log(`✅ ${c.user.tag} is online.`);
 });
 
-client.on('messageCreate', (message) => {
+client.on(ClientEvents.MessageCreate, (message) => {
     if (message.author.bot) {
         return;
     }

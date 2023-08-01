@@ -1,8 +1,15 @@
 {
-  "extends": "@tsconfig/node16/tsconfig.json",
+  //"extends": "@tsconfig/node16/tsconfig.json",
   "include": ["src/**/*"],
   "exclude": ["node_modules"],
   "compilerOptions": {
+    "baseUrl": "./src",
+    "moduleResolution": "nodenext",
+    "paths": {
+      "@enums/*": ["enums/*.ts"],
+      "@types/*": ["types/*.ts"],
+      "@modules/*": ["modules/*"]
+    },
     "esModuleInterop": true,
     "target": "es6",
     "outDir": "dist",
