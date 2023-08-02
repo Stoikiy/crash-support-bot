@@ -13,6 +13,8 @@
     "esModuleInterop": true,
     "target": "es6",
     "outDir": "dist",
-    "allowSyntheticDefaultImports": true
+    "allowSyntheticDefaultImports": true,
+    "allowImportingTsExtensions": true,
+    "module": "Node16"
   }
 }

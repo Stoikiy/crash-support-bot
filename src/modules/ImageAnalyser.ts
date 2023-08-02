@@ -1,35 +1,60 @@
 import Tesseract, {ImageLike} from 'tesseract.js';
 
-import {Languages} from '@enums/index';
+import {Languages} from '../enums/index.js';
 
 class ImageAnalyser {
-    private image: ImageLike;
-    private text: string;
-    private lang: string;
+    private _image: ImageLike;
+    private _text: string;
+    private _lang: string;
+    private _searchValues: string[];
+    private _foundedValues: string[]
+
     constructor() {
-        this.image = {} as ImageLike;
-        this.text = '';
-        this.lang = Languages.English
+        this._image = {} as ImageLike;
+        this._text = '';
+        this._lang = Languages.English;
+        this._searchValues = ['program will be terminated', 'not sdl file'];
+        this._foundedValues = [];
     }
 
-    setImage(sample: ImageLike) {
-        this.image = sample;
+    public set text(str: string) {
+        this._text = str;
     }
 
-    getText() {
-        return this.text;
+    public set image(sample: ImageLike) {
+        this._image = sample;
     }
 
-    searchOnImage() {
-        Tesseract.recognize(
-            this.image,
-            this.lang, { logger: m => console.log(m) }
-        ).then(({ data: { text } }) => {
-            this.text = text;
-            console.log('text from img => ', text);
+    public get text() {
+        return this._text;
+    }
+
+    public get image() {
+        return this._image;
+    }
+
+    public get foundedValues() {
+        return this._foundedValues;
+    }
+
+    public searchOnImage(): Promise<string[]> {
+     return new Promise((resolve, reject) => {
+            Tesseract.recognize(this.image, this._lang).then(({ data: { text } }) => {
+                this._searchValues.some(str => {
+
+                    console.log(text);
+
+                    // TODO replace with search regex
+                    if (text.toLowerCase().includes(str)) {
+                        this._foundedValues.push(str)
+                        resolve(this._searchValues)
+                    }
+
+                    reject('No data match')
+                })
+            })
         })
     }
-
 }
 
 export default ImageAnalyser;
