@@ -10,9 +10,10 @@ const analyser = new ImageAnalyser();
 //TODO create class?
 async function respondWithAnswer(message:  Message, samples: string[]) {
     try {
-       await message.reply(`Looks like you need some help with errors: (${samples.toString()}), try to use this link ${process.env.FAQ_LINK}`)
+        const formattedArray = samples.map(item => `* ${item}`);
+        await message.reply(`Looks like you need some help with following errors: \n ${formattedArray.join('\n')} \n try to use this guide: \n ${process.env.FAQ_LINK}`)
     } catch (e) {
-        console.warn(e)
+        console.error(e)
     }
 }
 
@@ -34,8 +35,6 @@ client.on(ClientEvents.MessageCreate, (message) => {
         return;
     }
 
-    // console.log('message => ', message, 'content => ', message.content)
-
     if (message.content) {
         analyser.text = message.content;
 
@@ -47,7 +46,9 @@ client.on(ClientEvents.MessageCreate, (message) => {
         analyser.image = firstItem.url;
         analyser.searchOnImage().then(data => {
             if (data.length > 0) {
-                respondWithAnswer(message, data)
+                respondWithAnswer(message, data).catch(e => {
+                    console.warn(e);
+                })
             }
         }).catch(e => {
             console.warn(e)

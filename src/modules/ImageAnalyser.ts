@@ -6,15 +6,17 @@ class ImageAnalyser {
     private _image: ImageLike;
     private _text: string;
     private _lang: string;
-    private _searchValues: string[];
-    private _foundedValues: string[]
+    private _valuesMap: Map<string, string>;
 
     constructor() {
         this._image = {} as ImageLike;
         this._text = '';
         this._lang = Languages.English;
-        this._searchValues = ['program will be terminated', 'not sdl file'];
-        this._foundedValues = [];
+        this._valuesMap = new Map([
+            ['crash', 'Program was crashed'],
+            ['terminated', 'Program Will be terminated'],
+            ['sdl', 'No SDL File']
+        ])
     }
 
     public set text(str: string) {
@@ -33,25 +35,19 @@ class ImageAnalyser {
         return this._image;
     }
 
-    public get foundedValues() {
-        return this._foundedValues;
-    }
-
     public searchOnImage(): Promise<string[]> {
      return new Promise((resolve, reject) => {
-            Tesseract.recognize(this.image, this._lang).then(({ data: { text } }) => {
-                this._searchValues.some(str => {
-
-                    console.log(text);
-
-                    // TODO replace with search regex
-                    if (text.toLowerCase().includes(str)) {
-                        this._foundedValues.push(str)
-                        resolve(this._searchValues)
+            Tesseract.recognize(this.image, this._lang).then(({ data: {text}}) => {
+                let finds: string[] = [];
+                this._valuesMap.forEach((value, key) => {
+                    // TODO add search by user text
+                    if (text.toLowerCase().match(new RegExp(key, 'ig'))) {
+                        finds.push(this._valuesMap.get(key))
                     }
-
-                    reject('No data match')
                 })
+                resolve(finds);
+            }).catch(e => {
+                reject(`No data match - ${e}`)
             })
         })
     }
